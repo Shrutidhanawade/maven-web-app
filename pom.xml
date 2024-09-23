@@ -38,13 +38,7 @@
       
     </plugins>
   </build>
-  <servers>
-  <server>
-    <id>TomcatServer</id>
-    <username>tomcat</username>
-    <password>admin</password>
-  </server>
-</servers>
+ 
 
   
   <distributionManagement>
