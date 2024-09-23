@@ -1,15 +1,19 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
 pool:
-  name: Default
+  name: azure-first project
 
 steps:
+- script: |
+    # Download and install Apache Tomcat 9
+    wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.95/bin/apache-tomcat-9.0.95.tar.gz
+    sudo tar -xzf apache-tomcat-9.0.95.tar.gz -C /opt/
+    sudo mv /opt/apache-tomcat-9.0.95 /opt/tomcat
+    sudo chmod +x /opt/tomcat/bin/*.sh
+    sudo sh /opt/tomcat/bin/startup.sh
+  displayName: 'Install Apache Tomcat 9'
+
 - task: Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
@@ -21,12 +25,19 @@ steps:
     mavenAuthenticateFeed: false
     effectivePomSkip: false
     sonarQubeRunAnalysis: false
+  displayName: 'Build Project with Maven'
 
-
+- script: |
+    # Deploy the WAR file to Tomcat
+    sudo cp target/*.war /opt/tomcat/webapps/
+    sudo /opt/tomcat/bin/shutdown.sh
+    sudo /opt/tomcat/bin/startup.sh
+  displayName: 'Deploy WAR to Tomcat'
+  
 - task: Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
-    goals: 'tomcat7:deploy'
+    goals: 'tomcat8:deploy'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     javaHomeOption: 'JDKVersion'
