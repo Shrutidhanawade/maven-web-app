@@ -40,14 +40,14 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       # Monitor Application Health via Application Insights
-      az monitor metrics list --resource /subscriptions/c7a98f37-d81d-4e9f-bd12-8efa59be841b/resourceGroups/nevault/providers/Microsoft.Insights/components/d90b3683-b289-40bd-a29b-f2184a0e84f0 --metric "Requests" --interval PT1M
+      /subscriptions/c7a98f37-d81d-4e9f-bd12-8efa59be841b/resourceGroups/nevault/providers/Microsoft.Insights/components/ADT-60 --metric "Requests" --interval PT1M
   displayName: 'Monitor with Application Insights'
 
 # Step 5: Conditional Rollback on Failure
 - script: |
     echo "Checking Application Health..."
     # Check for critical issues in the logs (sample logic)
-    if [ $(az monitor metrics list --resource /subscriptions/c7a98f37-d81d-4e9f-bd12-8efa59be841b/resourceGroups/nevault/providers/Microsoft.Insights/components/d90b3683-b289-40bd-a29b-f2184a0e84f0 --metric "Failed Requests" --interval PT1M --query "value[0].total") -gt 10 ]; then
+    if [ $(/subscriptions/c7a98f37-d81d-4e9f-bd12-8efa59be841b/resourceGroups/nevault/providers/Microsoft.Insights/components/ADT-60 --metric "Failed Requests" --interval PT1M --query "value[0].total") -gt 10 ]; then
       echo "Detected failure. Initiating rollback..."
       sudo /opt/tomcat/bin/shutdown.sh
       # Rollback logic (e.g., redeploy previous stable version)
