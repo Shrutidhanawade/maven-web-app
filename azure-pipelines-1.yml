@@ -35,7 +35,7 @@ steps:
 # Step 4: Monitor Application with Application Insights
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'c7a98f37-d81d-4e9f-bd12-8efa59be841b'
+    azureSubscription: 'ADT-60'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
