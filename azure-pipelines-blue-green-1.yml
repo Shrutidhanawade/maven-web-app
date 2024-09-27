@@ -1,0 +1,98 @@
+trigger:
+- master  # Trigger the pipeline on changes to the master branch
+
+pool:
+  name: 'azure-first project'  # Use the specified agent pool
+
+variables:
+  blueEnvironment: 'blue'
+  greenEnvironment: 'green'
+
+stages:
+# Step 1: Build the Project
+- stage: Build
+  jobs:
+  - job: BuildJob
+    pool:
+      name: 'azure-first project'  # Use the specified agent pool
+    steps:
+    - script: |
+        echo "Building the web application..."
+        mvn clean package  # Build the project with Maven
+      displayName: 'Build Project with Maven'
+
+# Step 2: Deploy to Blue Environment
+- stage: DeployToBlue
+  jobs:
+  - deployment: DeployBlue
+    environment: $(blueEnvironment)  # Define Blue environment
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Installing Apache Tomcat 9 in Blue environment..."
+              wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.95/bin/apache-tomcat-9.0.95.tar.gz
+              sudo tar -xzf apache-tomcat-9.0.95.tar.gz -C /opt/
+              sudo mv /opt/apache-tomcat-9.0.95 /opt/tomcat-blue  # Install to a different directory
+              sudo chmod +x /opt/tomcat-blue/bin/*.sh
+              sudo sh /opt/tomcat-blue/bin/startup.sh
+            displayName: 'Install Apache Tomcat 9 in Blue'
+
+          - script: |
+              echo "Deploying WAR to Blue environment..."
+              sudo cp target/*.war /opt/tomcat-blue/webapps/
+              sudo /opt/tomcat-blue/bin/shutdown.sh
+              sudo /opt/tomcat-blue/bin/startup.sh
+            displayName: 'Deploy WAR to Blue Environment'
+
+# Step 3: Deploy to Green Environment
+- stage: DeployToGreen
+  jobs:
+  - deployment: DeployGreen
+    environment: $(greenEnvironment)  # Define Green environment
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Installing Apache Tomcat 9 in Green environment..."
+              wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.95/bin/apache-tomcat-9.0.95.tar.gz
+              sudo tar -xzf apache-tomcat-9.0.95.tar.gz -C /opt/
+              sudo mv /opt/apache-tomcat-9.0.95 /opt/tomcat-green  # Install to a different directory
+              sudo chmod +x /opt/tomcat-green/bin/*.sh
+              sudo sh /opt/tomcat-green/bin/startup.sh
+            displayName: 'Install Apache Tomcat 9 in Green'
+
+          - script: |
+              echo "Deploying WAR to Green environment..."
+              sudo cp target/*.war /opt/tomcat-green/webapps/
+              sudo /opt/tomcat-green/bin/shutdown.sh
+              sudo /opt/tomcat-green/bin/startup.sh
+            displayName: 'Deploy WAR to Green Environment'
+
+# Step 4: Switch Traffic to Blue Environment
+- stage: SwitchTrafficToBlue
+  dependsOn: DeployToGreen
+  jobs:
+  - job: SwitchTraffic
+    steps:
+    - script: |
+        echo "Switching traffic to Blue environment..."
+        # Implement traffic routing logic here (e.g., update DNS or load balancer)
+        # This is a placeholder for actual traffic switch logic
+      displayName: 'Switch Traffic to Blue'
+
+# Step 5: Cleanup Old WAR Files in Green Environment
+- stage: CleanupGreen
+  jobs:
+  - deployment: Cleanup
+    environment: $(greenEnvironment)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Cleaning up Green environment..."
+              sudo rm -rf /opt/tomcat-green/webapps/*.war  # Remove old WAR files if necessary
+            displayName: 'Cleanup Old WAR Files in Green'
