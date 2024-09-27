@@ -27,21 +27,31 @@ steps:
     sonarQubeRunAnalysis: false
   displayName: 'Build Project with Maven'
 
+# Step 3: Run Tests
 - script: |
+    echo "Running Tests..."
+    mvn test  # Run tests using Maven
+  displayName: 'Run Tests'
+
+# Step 4: Deploy the WAR file to Tomcat
+- script: |
+    echo "Deploying WAR to Tomcat..."
     # Deploy the WAR file to Tomcat
     sudo cp target/*.war /opt/tomcat/webapps/
     sudo /opt/tomcat/bin/shutdown.sh
     sudo /opt/tomcat/bin/startup.sh
   displayName: 'Deploy WAR to Tomcat'
-  
-- task: Maven@4
+
+# Optional: Step 5: Cleanup
+- script: |
+    echo "Cleaning up..."
+    sudo rm -rf /opt/tomcat/webapps/*.war  # Remove old WAR files if necessary
+  displayName: 'Cleanup Old WAR Files'
+
+# Notifications (Optional)
+- task: Email@1  # Replace with a notification mechanism of your choice
   inputs:
-    mavenPomFile: 'pom.xml'
-    goals: 'tomcat7:deploy'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    mavenVersionOption: 'Default'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: false
+    to: 'shruti.dhanwade@amrutsoftware.com'
+    subject: 'Pipeline Status'
+    body: 'The CI/CD pipeline has completed.'
+  displayName: 'Send Notification'
