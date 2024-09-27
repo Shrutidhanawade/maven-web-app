@@ -48,10 +48,3 @@ steps:
     sudo rm -rf /opt/tomcat/webapps/*.war  # Remove old WAR files if necessary
   displayName: 'Cleanup Old WAR Files'
 
-# Notifications (Optional)
-- task: Email@1  # Replace with a notification mechanism of your choice
-  inputs:
-    to: 'shruti.dhanwade@amrutsoftware.com'
-    subject: 'Pipeline Status'
-    body: 'The CI/CD pipeline has completed.'
-  displayName: 'Send Notification'
