@@ -44,7 +44,7 @@ steps:
       az account set --subscription c7a98f37-d81d-4e9f-bd12-8efa59be841b
 
       # Monitor Application Health via Application Insights
-      az monitor metrics list --resource /subscriptions/c7a98f37-d81d-4e9f-bd12-8efa59be841b/resourceGroups/nevault/providers/Microsoft.Insights/components/ADT-60 --metric-names '*' --interval PT1M
+      az monitor metrics list --resource /subscriptions/c7a98f37-d81d-4e9f-bd12-8efa59be841b/resourceGroups/nevault/providers/Microsoft.Insights/components/ADT-60 --metrics "availabilityResults/availabilityPercentage" --interval PT1M
 
 # Step 5: Conditional Rollback on Failure
 - script: |
