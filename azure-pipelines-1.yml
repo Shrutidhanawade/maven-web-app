@@ -3,7 +3,7 @@ trigger:
 - master  # Trigger the pipeline on changes to the master branch
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: azure-first project
 
 steps:
 # Step 1: Install Apache Tomcat
@@ -36,7 +36,7 @@ steps:
 # Step 4: Monitor Application with Application Insights
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'new server'  # Use the correct service connection name
+    azureSubscription: 'ADT-60'  # Use the correct service connection name
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
