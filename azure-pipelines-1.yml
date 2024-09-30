@@ -3,7 +3,7 @@ trigger:
 - master  # Trigger the pipeline on changes to the master branch
 
 pool:
-  name: azure-first project
+  name: default
 
 steps:
 # Step 1: Install Apache Tomcat
